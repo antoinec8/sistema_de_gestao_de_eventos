@@ -1,0 +1,57 @@
+# sistema-eventos/docker-compose.yml
+version: '3.8'
+
+services:
+  # 1. O Porteiro (Framework)
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api-gateway:/app
+      - /app/node_modules
+    depends_on:
+      - auth-service
+      - event-service
+      - booking-service # Adicione esta dependência
+
+  # 2. O Segurança (Framework)
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth-service
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./services/auth-service:/app
+      - /app/node_modules
+
+  # 3. A Feature (SPL)
+  event-service:
+    build: ./services/event-service
+    container_name: event-service
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./services/event-service:/app
+      - /app/node_modules
+
+  # 4. NOVA FEATURE (SPL)
+  booking-service:
+    build: ./services/booking-service
+    container_name: booking-service
+    ports:
+      - "8003:8003"
+    #volumes:
+    #  - ./services/booking-service:/app
+    #  - /app/node_modules
+
+  # 5. Serviço de Pagamento (Framework)
+  payment-service:
+    build: ./services/payment-service
+    container_name: payment-service
+    ports:
+      - "8004:8004" # Expõe a porta para debug
+    volumes:
+      - ./services/payment-service:/app
+      - /app/node_modules

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    /* Configurações de Módulo */
+    "module": "commonjs", // Diz para usar a sintaxe antiga de 'require'
+    "esModuleInterop": true, // <<< ESTA É A CORREÇÃO MÁGICA
+    // Permite 'import' mesmo sendo 'commonjs'
+
+    /* Configurações de Emissão */
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    /* Configurações de Rigor */
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Outros */
+    "skipLibCheck": true
+  }
+}
