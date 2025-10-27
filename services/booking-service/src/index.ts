@@ -10,9 +10,9 @@ app.use(express.json());
 
 const SECRET_KEY = 'sua-chave-secreta-para-jwt';
 const PAYMENT_SERVICE_URL = 'http://payment-service:8004';
-const EVENT_SERVICE_URL = 'http://event-service:8002'; // <<< Endereço do Event Service
+const EVENT_SERVICE_URL = 'http://event-service:8002'; 
 
-interface Booking { /* ... (interface igual) ... */
+interface Booking { 
   id: number;
   userId: number;
   eventId: number;
@@ -21,7 +21,7 @@ interface Booking { /* ... (interface igual) ... */
   status: 'pending' | 'confirmed' | 'failed';
   transactionId?: string;
 }
-// Interface para os dados do evento (campos que precisamos)
+// Interface para os dados do evento
 interface EventDetails {
     id: number;
     nome: string;
@@ -31,7 +31,7 @@ interface EventDetails {
 
 let bookings: Booking[] = [];
 
-const checkAuth = (req: any, res: any, next: any) => { /* ... (código igual) ... */
+const checkAuth = (req: any, res: any, next: any) => { 
     try {
         const token = req.headers.authorization.split(' ')[1];
         const decodedToken = jwt.verify(token, SECRET_KEY);
@@ -42,20 +42,20 @@ const checkAuth = (req: any, res: any, next: any) => { /* ... (código igual) ..
     }
 };
 
-// --- Rota: Inscrever-se em um evento (MODIFICADA para buscar detalhes do evento) ---
+// --- Rota: Inscrever-se em um evento ---
 app.post('/:eventId', checkAuth, async (req: any, res) => {
   const eventId = parseInt(req.params.eventId);
   const userId = req.userData.id;
   const userEmail = req.userData.email;
 
-  const existingConfirmedBooking = bookings.find( /* ... (código igual) ... */
+  const existingConfirmedBooking = bookings.find( 
     b => b.userId === userId && b.eventId === eventId && b.status === 'confirmed'
   );
   if (existingConfirmedBooking) {
     return res.status(400).json({ message: 'Você já está inscrito e confirmado neste evento.' });
   }
 
-  // --- MUDANÇA PRINCIPAL: Buscar detalhes do evento ---
+  // --- Buscar detalhes do evento ---
   let eventDetails: EventDetails;
   try {
       console.log(`Booking Service: Buscando detalhes do evento ${eventId} em ${EVENT_SERVICE_URL}/${eventId}`);
@@ -94,8 +94,8 @@ app.post('/:eventId', checkAuth, async (req: any, res) => {
   } else {
       // Evento Pago: Tenta processar o pagamento
       try {
-        const amount = eventDetails.price; // Usa o preço do evento!
-        console.log(`Booking Service: Enviando requisição de pagamento (R$${amount / 100}) para ${PAYMENT_SERVICE_URL}/process-payment`); // Mostra valor formatado
+        const amount = eventDetails.price; // Usa o preço do evento
+        console.log(`Booking Service: Enviando requisição de pagamento (R$${amount / 100}) para ${PAYMENT_SERVICE_URL}/process-payment`);
         const paymentResponse = await axios.post(`${PAYMENT_SERVICE_URL}/process-payment`, {
           bookingId: newBooking.id,
           amount: amount // Envia o valor correto
@@ -126,8 +126,8 @@ app.post('/:eventId', checkAuth, async (req: any, res) => {
   // --- Fim da decisão ---
 });
 
-// Rota: Listar minhas inscrições - Sem mudanças
-app.get('/my-bookings', checkAuth, (req: any, res) => { /* ... (código igual) ... */
+// Rota: Listar minhas inscrições
+app.get('/my-bookings', checkAuth, (req: any, res) => {
   const userId = req.userData.id;
   const myBookings = bookings.filter(b => b.userId === userId);
   res.status(200).json(myBookings);

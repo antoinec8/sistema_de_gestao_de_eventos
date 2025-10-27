@@ -9,23 +9,23 @@ app.use(express.json());
 
 const SECRET_KEY = 'sua-chave-secreta-para-jwt';
 
-// --- Interface e "Banco de Dados" Fake ---
+// --- Interface e Banco de Dados ---
 interface Event {
     id: number;
     nome: string;
     local: string;
     ownerId: number;
-    isPaid: boolean; // <<< NOVO CAMPO
-    price: number;   // <<< NOVO CAMPO (Preço em centavos ou formato numérico)
+    isPaid: boolean; 
+    price: number;   
 }
 
 let events: Event[] = [
     { id: 1, nome: "Palestra de Reuso de Software", local: "UFAL", ownerId: 0, isPaid: false, price: 0 },
     { id: 2, nome: "Workshop de Microsserviços", local: "Instituto de Computação", ownerId: 0, isPaid: true, price: 2500 } // Ex: R$ 25,00
 ];
-// --- Fim DB Fake ---
+// --- Fim DB ---
 
-const checkAuth = (req: any, res: any, next: any) => { /* ... (código igual) ... */
+const checkAuth = (req: any, res: any, next: any) => { 
     try {
         const token = req.headers.authorization.split(' ')[1];
         const decodedToken = jwt.verify(token, SECRET_KEY);
@@ -41,7 +41,7 @@ app.get('/', (req, res) => {
     res.status(200).json(events);
 });
 
-// Rota: Obter detalhes de UM evento (útil para o booking-service)
+// Rota: Obter detalhes de UM evento
 app.get('/:id', (req, res) => {
     const eventId = parseInt(req.params.id);
     const event = events.find(e => e.id === eventId);
@@ -53,7 +53,7 @@ app.get('/:id', (req, res) => {
 });
 
 
-// Rota: Criar um evento (PROTEGIDA, recebe novos campos)
+// Rota: Criar um evento 
 app.post('/', checkAuth, (req: any, res) => {
     if (req.userData.role !== 'creator') {
         return res.status(403).json({ message: 'Apenas criadores podem adicionar eventos.' });
@@ -83,7 +83,7 @@ app.post('/', checkAuth, (req: any, res) => {
     res.status(201).json(newEvent);
 });
 
-// Rota: Deletar um evento (PROTEGIDA) - Sem mudanças na lógica principal
+// Rota: Deletar um evento 
 app.delete('/:id', checkAuth, (req: any, res) => {
     const eventId = parseInt(req.params.id);
     const userId = req.userData.id;

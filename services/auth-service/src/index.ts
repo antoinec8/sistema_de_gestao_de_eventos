@@ -8,8 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- Banco de Dados Fake ---
-// Adicionamos o campo 'role'
+// --- Banco de Dados ---
 interface User { // Definindo a interface para clareza
   id: number;
   email: string;
@@ -21,10 +20,10 @@ const users: User[] = [];
 
 const SECRET_KEY = 'sua-chave-secreta-para-jwt';
 
-// --- Rota de Registro (Modificada) ---
+// --- Rota de Registro ---
 app.post('/register', async (req, res) => {
   try {
-    const { email, password, role } = req.body; // Recebe o 'role' do front-end
+    const { email, password, role } = req.body;
 
     // Validação básica do papel
     if (!role || (role !== 'creator' && role !== 'attendee')) {
@@ -40,7 +39,7 @@ app.post('/register', async (req, res) => {
       id: users.length + 1,
       email: email,
       password: hashedPassword,
-      role: role, // Armazena o papel
+      role: role,
     };
     users.push(newUser);
 
@@ -52,7 +51,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// --- Rota de Login (Modificada) ---
+// --- Rota de Login ---
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -67,13 +66,13 @@ app.post('/login', async (req, res) => {
 
     // Gera o Token JWT incluindo o papel (role)
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role }, // <<< INCLUI O PAPEL AQUI
+      { id: user.id, email: user.email, role: user.role }, 
       SECRET_KEY,
       { expiresIn: '1h' }
     );
 
     // Retorna o token E o papel para o front-end saber
-    res.status(200).json({ token: token, role: user.role }); // <<< RETORNA O PAPEL AQUI
+    res.status(200).json({ token: token, role: user.role });
 
   } catch (error) {
     res.status(500).json({ message: 'Erro interno no servidor' });
